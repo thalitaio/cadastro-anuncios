@@ -1,4 +1,12 @@
 class Anuncio {
+  /**
+   * @constructor
+   * @param {string} nomeAnuncio Nome do anúncio cadastrado.
+   * @param {string} dataInicio Data do início da veiculação do anúncio.
+   * @param {string} dataTermino Data do término da veiculação do anúncio.
+   * @param {number} valorInvestido Valor investido por dia no anúncio.
+   * @param {string} cliente Nome do cliente.
+   */
   constructor(nomeAnuncio, dataInicio, dataTermino, valorInvestido, cliente) {
     this.nomeAnuncio = nomeAnuncio;
     this.dataInicio = dataInicio;
@@ -7,6 +15,11 @@ class Anuncio {
     this.cliente = cliente;
   }
 
+  /**
+   * Converte o input do nome do cliente para uppercase
+   * @returns false caso o valor seja undefined, "" ou null
+   * @returns true caso o valor seja validado com sucesso
+   */
   validarDados() {
     this.cliente = this.cliente.toUpperCase();
     for (let i in this) {
@@ -17,7 +30,10 @@ class Anuncio {
     return true;
   }
 }
-
+/**
+ * Classe para o banco de dados na localStorage
+ * Verifica se o id da localStorage é null e o seta para 0
+ */
 class Bd {
   constructor() {
     let id = localStorage.getItem("id");
@@ -26,58 +42,66 @@ class Bd {
       localStorage.setItem("id", 0);
     }
   }
-
+  /**
+   * Verifica o id atual e o incrementa
+   * @returns id seguinte a ser gravado
+   */
   getProximoId() {
     let proximoId = localStorage.getItem("id");
     return parseInt(proximoId) + 1;
   }
-
+  /**
+   * Grava o anúncio, selecionando o id correto.
+   * @param {*} d
+   */
   gravar(d) {
     let id = this.getProximoId();
     localStorage.setItem(id, JSON.stringify(d));
     localStorage.setItem("id", id);
   }
-
+  /**
+   * Recupera todos os anuncios cadastradas em localStorage.
+   * Verifica se itens foram removidos (null) e os pula para continuar.
+   * @returns Array anuncios com os anúncios recuperados.
+   */
   recuperarTodosRegistros() {
     let anuncios = [];
 
     let id = localStorage.getItem("id");
 
-    //recuperar todos os anuncios cadastradas em localStorage
     for (let i = 1; i <= id; i++) {
-      //recuperar anuncio
       let anuncio = JSON.parse(localStorage.getItem(i));
-
-      // pode haver itens pulados/removidos
-      // nesse casos nós valos pular esses itens
       if (anuncio === null) {
         continue;
       }
-
       anuncio.id = i;
       anuncios.push(anuncio);
     }
+
     return anuncios;
   }
 
+  /**
+   * Recupera os anúncios por cliente, data de início e de término.
+   * @param {*} anuncio instância da classe Anúncio.
+   * @returns array com anúncios filtrados.
+   */
   pesquisar(anuncio) {
     let anunciosFiltrados = [];
     anunciosFiltrados = this.recuperarTodosRegistros();
 
-    // recuperar cliente
     if (anuncio.cliente != "") {
       anunciosFiltrados = anunciosFiltrados.filter(
         (d) => d.cliente == anuncio.cliente
       );
     }
 
-    // recuperar dataInicio
     if (anuncio.dataInicio != "") {
       anunciosFiltrados = anunciosFiltrados.filter(
         (d) => d.dataInicio == anuncio.dataInicio
       );
     }
-    // recuperar dataTermino
+
     if (anuncio.dataTermino != "") {
       anunciosFiltrados = anunciosFiltrados.filter(
         (d) => d.dataTermino == anuncio.dataTermino
@@ -86,14 +110,23 @@ class Bd {
 
     return anunciosFiltrados;
   }
-
+  /**
+   * Remove os anúncios a partir de seus ids.
+   * @param {number} id do objeto salvo na localStorage.
+   */
   remover(id) {
     localStorage.removeItem(id);
   }
 }
-
+/**
+ * @type {Object}
+ */
 let bd = new Bd();
 
+/**
+ * Cadastra a nova instância do Anúncio na localStorage, verificando se todos os campos foram preenchidos corretamente.
+ *
+ */
 function cadastrarAnuncio() {
   let nomeAnuncio = document.getElementById("nomeAnuncio");
   let dataInicio = document.getElementById("dataInicio");
@@ -111,54 +144,67 @@ function cadastrarAnuncio() {
 
   if (anuncio.validarDados()) {
     bd.gravar(anuncio);
-
-    //personaliza modal
-    document.getElementById("titulo").innerHTML =
-      "Anúncio inserido com sucesso";
-    document.getElementById("titulo-div").className =
-      "modal-header text-success";
-    document.getElementById("texto").innerHTML =
-      "Anúncio foi cadastrado com sucesso!";
-    document.getElementById("botao").innerHTML = "Voltar";
-
-    document.getElementById("botao").className = "btn btn-success";
-
-    //limpar campos
-    nomeAnuncio.value = "";
-    dataInicio.value = "";
-    dataTermino.value = "";
-    valorInvestido.value = "";
-    cliente.value = "";
-
-    //dialog de sucesso
-    $("#modalRegistroAnuncio").modal("show");
+    criarModalSucesso();
+    limpaCampos();
   } else {
-    //personaliza modal
-    document.getElementById("titulo").innerHTML = "Erro no cadastro";
-    document.getElementById("titulo-div").className =
-      "modal-header text-danger";
-    document.getElementById("texto").innerHTML =
-      "Existem campos obrigatórios que não foram preenchidos.";
-    document.getElementById("botao").innerHTML = "Corrigir";
-    document.getElementById("botao").className = "btn btn-danger";
-
-    //dialog de erro
-    $("#modalRegistroAnuncio").modal("show");
+    criarModalErro();
   }
 }
 
+/**
+ * Cria o modal de cadastro realizado com sucesso.
+ */
+function criarModalSucesso() {
+  document.getElementById("titulo").innerHTML = "Anúncio inserido com sucesso";
+  document.getElementById("titulo-div").className = "modal-header text-success";
+  document.getElementById("texto").innerHTML =
+    "Anúncio foi cadastrado com sucesso!";
+  document.getElementById("botao").innerHTML = "Voltar";
+
+  document.getElementById("botao").className = "btn btn-success";
+
+  $("#modalRegistroAnuncio").modal("show");
+}
+
+/**
+ * Cria o modal de erro no cadastro.
+ */
+function criarModalErro() {
+  document.getElementById("titulo").innerHTML = "Erro no cadastro";
+  document.getElementById("titulo-div").className = "modal-header text-danger";
+  document.getElementById("texto").innerHTML =
+    "Existem campos obrigatórios que não foram preenchidos.";
+  document.getElementById("botao").innerHTML = "Corrigir";
+  document.getElementById("botao").className = "btn btn-danger";
+
+  $("#modalRegistroAnuncio").modal("show");
+}
+
+/**
+ * Limpa os campos do cadastro.
+ */
+function limpaCampos() {
+  nomeAnuncio.value = "";
+  dataInicio.value = "";
+  dataTermino.value = "";
+  valorInvestido.value = "";
+  cliente.value = "";
+}
+
+/**
+ * Carrega lista de Anúncios para visualização, criando uma tabela com botão para excluir o anúncio da lista.
+ * @param {*} anuncios array com os anúncios a serem exibidos.
+ * @param {boolean} filtro
+ */
 function carregaListaAnuncios(anuncios = [], filtro = false) {
   if (anuncios.length == 0 && filtro == false) {
     anuncios = bd.recuperarTodosRegistros();
   }
 
-  //selecionando tbody da tabela
   let listaAnuncios = document.getElementById("listaAnuncios");
   listaAnuncios.innerHTML = "";
 
-  //percorre array anuncios listando cada anuncio de forma dinâmica
   anuncios.forEach(function (d) {
-    //criando a linha (tr)
     let linha = listaAnuncios.insertRow();
 
     let data1 = new Date(d.dataInicio.toString());
@@ -171,34 +217,32 @@ function carregaListaAnuncios(anuncios = [], filtro = false) {
     d.maxClicks = Math.ceil(d.totalInvestido * 3.6);
     d.maxShare = Math.ceil(d.totalInvestido * 0.5);
 
-    //criar as colunas (td) e atribuir seus conteúdos
-    linha.insertCell(0).innerHTML = d.totalInvestido;
-    linha.insertCell(1).innerHTML = d.maxViews;
-    linha.insertCell(2).innerHTML = d.maxClicks;
-    linha.insertCell(3).innerHTML = d.maxShare;
+    linha.insertCell(0).innerHTML = d.cliente;
+    linha.insertCell(1).innerHTML = `R$ ${d.totalInvestido},00`;
+    linha.insertCell(2).innerHTML = d.maxViews;
+    linha.insertCell(3).innerHTML = d.maxClicks;
+    linha.insertCell(4).innerHTML = d.maxShare;
 
-    //criar o botão de exclusão
     let btn = document.createElement("button");
     btn.className = "btn btn-danger btn-sm";
     btn.innerHTML = '<i class="fas fa-times"></i>';
     btn.id = `id_anuncio_${d.id}`;
     btn.onclick = function () {
-      //arrumar a string antes de remover
       let id = this.id.replace("id_anuncio_", "");
-      //remover a anuncio
       bd.remover(id);
 
       window.location.reload();
     };
-    linha.insertCell(4).append(btn);
+    linha.insertCell(5).append(btn);
   });
 }
 
+/**
+ * Pesquisa os anúncios e retorna a tabela apenas com os anúncios que correspondem aos parâmetros de pesquisa.
+ */
 function pesquisarAnuncio() {
-  let nomeAnuncio = document.getElementById("nomeAnuncio").value;
   let dataInicio = document.getElementById("dataInicio").value;
   let dataTermino = document.getElementById("dataTermino").value;
-  let valorInvestido = document.getElementById("valorInvestido").value;
   let cliente = document.getElementById("cliente").value.toUpperCase();
 
   let anuncio = new Anuncio(
@@ -212,4 +256,6 @@ function pesquisarAnuncio() {
   let anuncios = bd.pesquisar(anuncio);
 
   carregaListaAnuncios(anuncios, true);
+
+  limpaCampos();
 }
