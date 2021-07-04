@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Relatório de Anúncios</title>
+    <!-- Bootstrap -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC"
+      crossorigin="anonymous"
+    />
+    <!-- Font Awesome -->
+    <script
+      defer
+      src="https://use.fontawesome.com/releases/v5.0.8/js/all.js"
+    ></script>
+
+    <script src="app.js"></script>
+  </head>
+
+  <body onload="carregaListaAnuncios()">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary mb-5">
+      <div class="container">
+        <h1 class="text-light display-4">Cadastro de Anúncios</h1>
+        <a class="nav-link text-light" href="index.html">Cadastro</a>
+      </div>
+    </nav>
+
+    <div class="container">
+      <div class="row mb-5">
+        <div class="col">
+          <h5>Pequise aqui os relatórios</h5>
+        </div>
+      </div>
+
+      <div class="row mb-2">
+        <div class="col-3 d-none">
+          <label>Anuncio:</label>
+          <input
+            class="form-control"
+            type="text"
+            name="nomeAnuncio"
+            id="nomeAnuncio"
+          />
+        </div>
+        <div class="col-3">
+          <label>Data Início:</label>
+          <input
+            class="form-control"
+            type="date"
+            name="dataInicio"
+            id="dataInicio"
+          />
+        </div>
+
+        <div class="col-3">
+          <label>Data Fim:</label>
+          <input
+            class="form-control"
+            type="date"
+            name="dataTermino"
+            id="dataTermino"
+          />
+        </div>
+        <div class="col-4 d-none">
+          <label>Investimento:</label>
+          <input
+            class="form-control"
+            type="number"
+            min="0.01"
+            step="0.01"
+            name="valorInvestido"
+            id="valorInvestido"
+            placeholder="R$"
+          />
+        </div>
+        <div class="col-4">
+          <label>Cliente:</label>
+          <input
+            class="form-control"
+            type="text"
+            name="cliente"
+            id="cliente"
+            placeholder="ex: Divulga Tudo"
+          />
+        </div>
+
+        <div class="col-2 d-flex align-items-start mt-4">
+          <button
+            type="button"
+            class="btn btn-primary"
+            onclick="pesquisarAnuncio()"
+          >
+            <i class="fas fa-search"></i>
+          </button>
+        </div>
+      </div>
+
+      <div class="row mt-4">
+        <div class="col">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Valor Total Investido</th>
+                <th>Qtd. Máxima de Views</th>
+                <th>Qtd. Máxima de Clicks</th>
+                <th>Qtd. Máxima de Shares</th>
+                <th></th>
+              </tr>
+            </thead>
+
+            <tbody id="listaAnuncios"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
